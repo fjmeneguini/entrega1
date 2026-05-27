@@ -1,0 +1,7 @@
+{
+  "info": { "name": "Etapa1 - User Service", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "item": [
+    { "name": "Create User", "request": { "method": "POST", "header": [{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"username\": \"cliente1\",\n  \"password\": \"senha\",\n  \"role\": \"CUSTOMER\"\n}"}, "url": {"raw":"{{baseUrl}}/users","host":["{{baseUrl}}"],"path":["users"]}}},
+    { "name": "Login", "request": { "method": "POST", "header": [{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"username\": \"cliente1\",\n  \"password\": \"senha\"\n}"}, "url": {"raw":"{{baseUrl}}/users/login","host":["{{baseUrl}}"],"path":["users","login"]}}, "event":[{"listen":"test","script":{"exec":["var json = pm.response.json();","if(json.token) { pm.environment.set('jwt', json.token); }","pm.test('token present', function(){ pm.expect(json.token).to.be.a('string'); });"],"type":"text/javascript"}}] },
+    { "name": "Test Customer", "request": { "method": "GET", "header": [{"key":"Authorization","value":"Bearer {{jwt}}"}], "url": {"raw":"{{baseUrl}}/users/test/customer","host":["{{baseUrl}}"],"path":["users","test","customer"]}}]
+}

@@ -1,0 +1,6 @@
+com\ifsp\userservice\model\UserRecord.class
+com\ifsp\userservice\security\JwtAuthenticationFilter.class
+com\ifsp\userservice\config\SecurityConfig.class
+com\ifsp\userservice\security\JwtTokenService.class
+com\ifsp\userservice\UserServiceApplication.class
+com\ifsp\userservice\controller\UserController.class
