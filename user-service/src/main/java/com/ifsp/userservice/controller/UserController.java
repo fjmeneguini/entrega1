@@ -31,13 +31,14 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String username = body.get("username");
+        String email = body.get("email");
         String password = body.get("password");
         String role = body.getOrDefault("role", "CUSTOMER");
         if (username == null || password == null) return ResponseEntity.badRequest().body(Map.of("error","username/password required"));
         if (userRepository.existsByUsername(username)) return ResponseEntity.status(409).body(Map.of("error","user exists"));
         String hash = passwordEncoder.encode(password);
-        com.ifsp.userservice.model.User u = new com.ifsp.userservice.model.User(username, hash);
-        // ensure role exists
+        User u = new User(username, hash);
+        u.setEmail(email);
         Role roleEntity = roleRepository.findByName(role).orElseGet(() -> roleRepository.save(new Role(role)));
         u.getRoles().add(roleEntity);
         userRepository.save(u);
@@ -53,7 +54,6 @@ public class UserController {
         if (userOpt.isEmpty()) return ResponseEntity.status(401).body(Map.of("error","invalid credentials"));
         var user = userOpt.get();
         if (!passwordEncoder.matches(password, user.getPassword())) return ResponseEntity.status(401).body(Map.of("error","invalid credentials"));
-        // pick a role name to include in token (first role)
         String roleName = user.getRoles().stream().findFirst().map(r -> r.getName()).orElse("CUSTOMER");
         String token = jwtTokenService.generateToken(username, roleName);
         return ResponseEntity.ok(Map.of("token", token));
