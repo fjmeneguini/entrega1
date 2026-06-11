@@ -7,6 +7,7 @@ import com.ifsp.userservice.producer.UserProducer;
 import com.ifsp.userservice.repository.RoleRepository;
 import com.ifsp.userservice.repository.UserRepository;
 import com.ifsp.userservice.service.CodigoCacheService;
+import com.ifsp.userservice.security.JwtTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,18 +27,21 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final CodigoCacheService codigoCacheService;
     private final UserProducer userProducer;
+    private final JwtTokenService jwtTokenService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public AuthController(UserRepository userRepository,
                           RoleRepository roleRepository,
                           PasswordEncoder passwordEncoder,
                           CodigoCacheService codigoCacheService,
-                          UserProducer userProducer) {
+                          UserProducer userProducer,
+                          JwtTokenService jwtTokenService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.codigoCacheService = codigoCacheService;
         this.userProducer = userProducer;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @PostMapping("/request-code")
@@ -74,7 +78,15 @@ public class AuthController {
                 .filter(code::equals)
                 .map(found -> {
                     codigoCacheService.removeCode(email);
-                    return ResponseEntity.ok(Map.of("message", "code verified"));
+                User user = userRepository.findByEmail(email).orElseGet(() -> createTemporaryUser(email));
+                String roleName = user.getRoles().stream()
+                    .findFirst()
+                    .map(Role::getName)
+                    .map(name -> name.startsWith("ROLE_") ? name.substring(5) : name)
+                    .orElse("CUSTOMER");
+                    String principal = user.getEmail() != null ? user.getEmail() : user.getUsername();
+                    String token = jwtTokenService.generateToken(principal, roleName);
+                return ResponseEntity.ok(Map.of("message", "code verified", "token", token));
                 })
                 .orElseGet(() -> ResponseEntity.status(400).body(Map.of("error", "invalid or expired code")));
     }
@@ -83,8 +95,8 @@ public class AuthController {
         String randomPassword = passwordEncoder.encode(Long.toHexString(secureRandom.nextLong()));
         User user = new User(email, randomPassword);
         user.setEmail(email);
-        Role role = roleRepository.findByName("ROLE_CUSTOMER")
-                .orElseGet(() -> roleRepository.save(new Role("ROLE_CUSTOMER")));
+        Role role = roleRepository.findByName("CUSTOMER")
+            .orElseGet(() -> roleRepository.save(new Role("CUSTOMER")));
         user.getRoles().add(role);
         return userRepository.save(user);
     }

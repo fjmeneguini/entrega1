@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1 class="title">Acesso liberado</h1>
+      <p class="subtitle">O código foi validado e a sessão foi criada.</p>
+      <div id="token-box" class="token-box">Carregando token...</div>
+      <div class="actions" style="margin-top: 20px;">
+        <a class="button secondary" href="/">Nova solicitação</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var token = sessionStorage.getItem('token');
+      var box = document.getElementById('token-box');
+
+      if (!token) {
+        box.textContent = 'Nenhum token encontrado na sessão.';
+        return;
+      }
+
+      box.textContent = 'Token JWT: ' + token;
+    }());
+  </script>
+</body>
+</html>
