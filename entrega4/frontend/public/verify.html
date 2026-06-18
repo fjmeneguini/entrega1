@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validar código</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/vendor/axios/axios.min.js"></script>
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1 class="title">Validar código</h1>
+      <p class="subtitle">Confirme o e-mail e digite o código recebido.</p>
+      <form id="verify-form">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+        <div class="field">
+          <label for="code">Código</label>
+          <input id="code" name="code" type="text" maxlength="6" placeholder="000000" required>
+        </div>
+        <div class="actions">
+          <button class="button primary" type="submit">Validar</button>
+          <a class="button secondary" href="/">Voltar</a>
+        </div>
+      </form>
+      <div id="message" class="message"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var emailInput = document.getElementById('email');
+      var codeInput = document.getElementById('code');
+      var messageBox = document.getElementById('message');
+      var form = document.getElementById('verify-form');
+
+      if (params.get('email')) {
+        emailInput.value = params.get('email');
+      }
+
+      function setMessage(text, isError) {
+        messageBox.className = isError ? 'message error' : 'message success';
+        messageBox.textContent = text;
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        axios.post('/verify-code', {
+          email: emailInput.value.trim(),
+          code: codeInput.value.trim()
+        }).then(function (response) {
+          if (response.data && response.data.token) {
+            sessionStorage.setItem('token', response.data.token);
+            setMessage('Código validado. Redirecionando...', false);
+            window.location.href = '/register';
+            return;
+          }
+
+          setMessage('Resposta inválida do servidor.', true);
+        }).catch(function (error) {
+          var fallback = 'Código inválido ou expirado.';
+          var serverMessage = error && error.response && error.response.data && error.response.data.error;
+          setMessage(serverMessage || fallback, true);
+        });
+      });
+    }());
+  </script>
+</body>
+</html>

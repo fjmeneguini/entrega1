@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Completar cadastro</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/vendor/axios/axios.min.js"></script>
+</head>
+<body>
+  <main class="page">
+    <section class="card">
+      <h1 class="title">Completar cadastro</h1>
+      <p class="subtitle">Informe seu nome e selecione o cargo.</p>
+
+      <form id="register-form">
+        <div class="field">
+          <label for="name">Nome</label>
+          <input id="name" name="name" type="text" placeholder="Seu nome" required>
+        </div>
+
+        <div class="field">
+          <label for="role">Cargo</label>
+          <select id="role" name="role" required>
+            <option value="ROLE_CUSTOMER">ROLE_CUSTOMER</option>
+            <option value="ROLE_ADMINISTRATOR">ROLE_ADMINISTRATOR</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Salvar perfil</button>
+          <a class="button secondary" href="/">Voltar</a>
+        </div>
+      </form>
+
+      <div id="message" class="message"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var form = document.getElementById('register-form');
+      var messageBox = document.getElementById('message');
+      var token = sessionStorage.getItem('token');
+
+      function setMessage(text, isError) {
+        messageBox.className = isError ? 'message error' : 'message success';
+        messageBox.textContent = text;
+      }
+
+      if (!token) {
+        setMessage('Sessão não encontrada. Faça o fluxo novamente.', true);
+        return;
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        axios.post('/register', {
+          name: document.getElementById('name').value.trim(),
+          role: document.getElementById('role').value
+        }, {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        }).then(function () {
+          setMessage('Perfil atualizado com sucesso.', false);
+          window.location.href = '/dashboard';
+        }).catch(function (error) {
+          var serverMessage = error && error.response && error.response.data && error.response.data.error;
+          setMessage(serverMessage || 'Erro ao atualizar perfil.', true);
+        });
+      });
+    }());
+  </script>
+</body>
+</html>

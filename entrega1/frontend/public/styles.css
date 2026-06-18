@@ -1,0 +1,162 @@
+:root {
+  --bg: #f4f1ea;
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #b45309;
+  --accent-dark: #92400e;
+  --border: #e5e7eb;
+  --shadow: 0 18px 50px rgba(17, 24, 39, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(180, 83, 9, 0.12), transparent 30%),
+    linear-gradient(180deg, #fffdf8 0%, var(--bg) 100%);
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.subtitle,
+.hint,
+.message {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.hint {
+  margin-top: 18px;
+  font-size: 0.95rem;
+}
+
+.field {
+  margin-top: 18px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--text);
+}
+
+select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--text);
+}
+
+input:focus {
+  outline: 2px solid rgba(180, 83, 9, 0.18);
+  border-color: var(--accent);
+}
+
+select:focus {
+  outline: 2px solid rgba(180, 83, 9, 0.18);
+  border-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 18px;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.button.primary:hover {
+  background: var(--accent-dark);
+}
+
+.button.secondary {
+  background: #f3f4f6;
+  color: var(--text);
+}
+
+.message {
+  margin-top: 18px;
+  min-height: 24px;
+  font-weight: 700;
+}
+
+.message.error {
+  color: #b91c1c;
+}
+
+.message.success {
+  color: #166534;
+}
+
+.token-box {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px dashed var(--border);
+  word-break: break-all;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+}
