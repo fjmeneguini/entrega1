@@ -37,6 +37,10 @@ app.get('/verify', function (req, res) {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 
+app.get('/register', function (req, res) {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
 app.post('/verify-code', function (req, res) {
   var email = (req.body.email || '').trim();
   var code = (req.body.code || '').trim();
@@ -56,6 +60,63 @@ app.post('/verify-code', function (req, res) {
       var message = (error.response && error.response.data && error.response.data.error) || 'Codigo invalido ou expirado.';
       res.status(status).json({ error: message });
     });
+});
+
+app.post('/register', function (req, res) {
+  var authHeader = req.headers.authorization;
+  var name = (req.body.name || '').trim();
+  var role = (req.body.role || '').trim();
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token não informado.' });
+  }
+  if (!name || !role) {
+    return res.status(400).json({ error: 'Nome e cargo são obrigatórios.' });
+  }
+
+  userServiceApi.post('/users/update-profile', { name: name, role: role }, {
+    headers: { Authorization: authHeader }
+  }).then(function (response) {
+    res.json(response.data);
+  }).catch(function (error) {
+    var status = (error.response && error.response.status) || 500;
+    var message = (error.response && error.response.data && error.response.data.error) || 'Falha ao atualizar perfil.';
+    res.status(status).json({ error: message });
+  });
+});
+
+app.get('/api/protected', function (req, res) {
+  var authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token não informado.' });
+  }
+
+  userServiceApi.get('/users/test/customer', {
+    headers: { Authorization: authHeader }
+  }).then(function (response) {
+    res.json(response.data);
+  }).catch(function (error) {
+    var status = (error.response && error.response.status) || 500;
+    var message = (error.response && error.response.data && error.response.data.error) || 'Falha ao acessar endpoint protegido.';
+    res.status(status).json({ error: message });
+  });
+});
+
+app.get('/users/me', function (req, res) {
+  var authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token não informado.' });
+  }
+
+  userServiceApi.get('/users/me', {
+    headers: { Authorization: authHeader }
+  }).then(function (response) {
+    res.json(response.data);
+  }).catch(function (error) {
+    var status = (error.response && error.response.status) || 500;
+    var message = (error.response && error.response.data && error.response.data.error) || 'Falha ao consultar perfil.';
+    res.status(status).json({ error: message });
+  });
 });
 
 app.get('/dashboard', function (req, res) {

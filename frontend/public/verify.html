@@ -57,7 +57,7 @@
           if (response.data && response.data.token) {
             sessionStorage.setItem('token', response.data.token);
             setMessage('Código validado. Redirecionando...', false);
-            window.location.href = '/dashboard';
+            window.location.href = '/register';
             return;
           }
 

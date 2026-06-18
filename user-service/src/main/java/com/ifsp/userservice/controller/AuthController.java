@@ -95,8 +95,8 @@ public class AuthController {
         String randomPassword = passwordEncoder.encode(Long.toHexString(secureRandom.nextLong()));
         User user = new User(email, randomPassword);
         user.setEmail(email);
-        Role role = roleRepository.findByName("CUSTOMER")
-            .orElseGet(() -> roleRepository.save(new Role("CUSTOMER")));
+        Role role = roleRepository.findByName("ROLE_CUSTOMER")
+            .orElseGet(() -> roleRepository.save(new Role("ROLE_CUSTOMER")));
         user.getRoles().add(role);
         return userRepository.save(user);
     }

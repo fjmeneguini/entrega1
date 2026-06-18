@@ -9,26 +9,63 @@
 <body>
   <main class="page">
     <section class="card">
-      <h1 class="title">Acesso liberado</h1>
-      <p class="subtitle">O código foi validado e a sessão foi criada.</p>
-      <div id="token-box" class="token-box">Carregando token...</div>
+      <h1 class="title">Dashboard</h1>
+      <p class="subtitle">Área protegida do usuário autenticado.</p>
+
       <div class="actions" style="margin-top: 20px;">
-        <a class="button secondary" href="/">Nova solicitação</a>
+        <button id="btn-protected" class="button primary" type="button">Testar endpoint protegido</button>
+        <button id="btn-profile" class="button secondary" type="button">Meu perfil</button>
+        <button id="btn-logout" class="button secondary" type="button">Sair</button>
       </div>
+
+      <pre id="result-box" class="token-box">Sem ações executadas.</pre>
     </section>
   </main>
 
+  <script src="/vendor/axios/axios.min.js"></script>
   <script>
     (function () {
       var token = sessionStorage.getItem('token');
-      var box = document.getElementById('token-box');
+      var resultBox = document.getElementById('result-box');
+      var protectedButton = document.getElementById('btn-protected');
+      var profileButton = document.getElementById('btn-profile');
+      var logoutButton = document.getElementById('btn-logout');
+
+      function setResult(data) {
+        resultBox.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      }
 
       if (!token) {
-        box.textContent = 'Nenhum token encontrado na sessão.';
+        setResult('Nenhum token encontrado na sessão.');
         return;
       }
 
-      box.textContent = 'Token JWT: ' + token;
+      protectedButton.addEventListener('click', function () {
+        axios.get('/api/protected', {
+          headers: { Authorization: 'Bearer ' + token }
+        }).then(function (response) {
+          setResult(response.data);
+        }).catch(function (error) {
+          var payload = (error.response && error.response.data) || { error: 'Erro ao chamar endpoint protegido.' };
+          setResult(payload);
+        });
+      });
+
+      profileButton.addEventListener('click', function () {
+        axios.get('/users/me', {
+          headers: { Authorization: 'Bearer ' + token }
+        }).then(function (response) {
+          setResult(response.data);
+        }).catch(function (error) {
+          var payload = (error.response && error.response.data) || { error: 'Erro ao buscar perfil.' };
+          setResult(payload);
+        });
+      });
+
+      logoutButton.addEventListener('click', function () {
+        sessionStorage.removeItem('token');
+        window.location.href = '/';
+      });
     }());
   </script>
 </body>

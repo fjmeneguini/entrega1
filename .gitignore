@@ -3,3 +3,7 @@ email-service/target/
 frontend/node_modules/
 frontend/.next/
 frontend/dist/
+.vscode/
+*.log
+.env
+.env.*
